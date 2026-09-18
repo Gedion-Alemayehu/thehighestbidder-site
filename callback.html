@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Authorisation callback — thehighestbidder</title>
+<link rel="stylesheet" href="style.css">
+</head><body>
+<header><div class="wrap">
+  <a class="brand" href="index.html">thehighestbidder</a>
+  <nav>
+    <a href="index.html">Overview</a>
+    <a href="privacy.html">Privacy Policy</a>
+    <a href="terms.html">Terms of Service</a>
+  </nav>
+</div></header>
+<main><div class="wrap">
+  <h1 id="title">Authorising…</h1>
+  <div id="body"></div>
+</div></main>
+<footer><div class="wrap">
+  <a href="index.html">Overview</a><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Service</a>
+</div></footer>
+<script>
+(function () {
+  var q = new URLSearchParams(window.location.search);
+  var title = document.getElementById("title");
+  var body = document.getElementById("body");
+
+  function esc(s){ var d=document.createElement("div"); d.textContent=s; return d.innerHTML; }
+
+  if (q.get("error")) {
+    title.textContent = "Authorisation failed";
+    body.innerHTML = '<div class="card"><p>TikTok returned:</p><p><code>'
+      + esc(q.get("error")) + "</code></p><p>"
+      + esc(q.get("error_description") || "") + "</p></div>";
+    return;
+  }
+
+  if (!q.get("code")) {
+    title.textContent = "Authorisation callback";
+    body.innerHTML = '<p>This page receives the authorisation code after you approve '
+      + 'access on TikTok. There is nothing to do here directly.</p>';
+    return;
+  }
+
+  title.textContent = "Authorised";
+  body.innerHTML =
+    '<p>Copy the full URL below and paste it into the terminal where '
+    + '<code>./run auth --paste</code> is waiting.</p>'
+    + '<div class="card"><p style="word-break:break-all;margin:0" id="u">'
+    + esc(window.location.href) + '</p></div>'
+    + '<p><button id="c" style="font:inherit;padding:9px 16px;border-radius:8px;'
+    + 'border:1px solid var(--line);background:var(--card);color:var(--fg);'
+    + 'cursor:pointer">Copy URL</button> <span id="ok" style="color:var(--muted)"></span></p>'
+    + '<p style="color:var(--muted);font-size:14px">This code is single-use and '
+    + 'expires shortly. It is not sent anywhere by this page.</p>';
+
+  document.getElementById("c").addEventListener("click", function () {
+    navigator.clipboard.writeText(window.location.href).then(function () {
+      document.getElementById("ok").textContent = "copied";
+    }, function () {
+      document.getElementById("ok").textContent = "copy failed — select the text above";
+    });
+  });
+})();
+</script>
+</body></html>
